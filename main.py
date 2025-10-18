@@ -2,6 +2,7 @@ import os
 import io  # <-- Add this import
 import PyPDF2  # <-- Add this import
 import json  # <-- FIX: Add this import
+from docx import Document
 import google.generativeai as genai
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -65,7 +66,7 @@ If you cannot find a specific piece of information, return "Not found" for that 
 @app.post("/summarize", response_model=LeaseReport)
 async def summarize_lease(file: UploadFile = File(...)):
     """
-    Receives a lease file (PDF or TXT), extracts text, queries Gemini,
+    Receives a lease file (PDF or TXT or DOCX), extracts text, queries Gemini,
     and returns a structured report.
     """
 
@@ -88,6 +89,15 @@ async def summarize_lease(file: UploadFile = File(...)):
             lease_text = contents.decode('utf-8')
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error parsing TXT file: {e}")
+    # adding support for .docx file.from
+    elif file.filename.endswith('.docx'):
+        try:
+            file_stream = io.BytesIO(contents)
+            doc = Document(file_stream)
+            lease_text = "".join([para.text for para in doc.paragraphs])
+            # lease_text = contents.decode('utf-8')
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Error parsing DOCX file: {e}")
 
     else:
         raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a .pdf or .txt file.")
