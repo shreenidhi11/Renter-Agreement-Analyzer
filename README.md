@@ -10,6 +10,8 @@ Technologies Used:
     
 Features:
     
-    •	Rapid answer retrieval due to usage of Redis Vector Search.
-    •	Monitoring & logging to track user queries, cache hits/misses, and latency
-    •	Collect user feedback about LLM responses
+    •	Analyses critical information from the renters document withins seconds 
+    •	Displays important information like Rent price, Pets and Guest allowances etc
+    •	Supports both PDF and TXT documents
+
+

@@ -7,8 +7,9 @@
 <body>
   <div class="container">
     <h1>Rental Agreement Summarizer</h1>
-    <p>Paste your full lease text below.</p>
-    <textarea id="lease-text" placeholder="Your lease text here..."></textarea>
+
+    <p>Upload your lease file (.pdf or .txt).</p>
+    <input type="file" id="lease-file" accept=".pdf,.txt" />
     <button id="summarize-btn">Get Report Card</button>
 
     <div id="loading" class="hidden">Summarizing...</div>
