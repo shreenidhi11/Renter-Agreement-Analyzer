@@ -10,8 +10,8 @@ Technologies Used:
     
 Features:
     
-    •	Analyses critical information from the renters document withins seconds 
-    •	Displays important information like Rent price, Pets and Guest allowances etc
+    •	Analyses critical information from the renters document withins 20 seconds 
+    •	Displays important information like Rent price, Penalty costs, Pets and Guest allowance rules etc
     •	Supports summarization for PDFs, DOCXs and TXT documents
 
 

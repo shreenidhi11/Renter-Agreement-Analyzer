@@ -16,13 +16,8 @@ h1 {
 p {
   font-size: 14px;
 }
-textarea {
-  width: 95%;
-  height: 150px;
+input[type="file"] {
   margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 5px;
 }
 button {
   background-color: #007aff;
@@ -39,17 +34,37 @@ button:hover {
 .hidden {
   display: none;
 }
+
+/* --- NEW CSS RULES --- */
+
 #results-container {
   margin-top: 15px;
   border-top: 1px solid #eee;
   padding-top: 10px;
+  /* Make the results scrollable */
+  max-height: 400px;
+  overflow-y: auto;
 }
-#results h3 {
-  font-size: 14px;
+
+#results .category {
+  font-size: 16px;
   color: #000;
+  background-color: #eee;
+  padding: 5px 8px;
+  border-radius: 4px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+#results .category:first-child {
+  margin-top: 0;
+}
+
+#results h4 {
+  font-size: 14px;
+  color: #333;
   margin-bottom: 5px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 3px;
+  margin-top: 0;
+  font-weight: 600;
 }
 #results p {
   font-size: 13px;
@@ -58,4 +73,6 @@ button:hover {
   padding: 8px;
   border-radius: 4px;
   margin-top: 0;
+  margin-bottom: 15px;
+  white-space: pre-wrap; /* Preserves line breaks from the AI */
 }

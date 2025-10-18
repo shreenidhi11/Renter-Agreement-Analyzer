@@ -6,7 +6,7 @@ from docx import Document
 import google.generativeai as genai
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
 # --- Configuration ---
@@ -23,13 +23,35 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 class LeaseReport(BaseModel):
     """The structured JSON output we want from the AI."""
-    security_deposit: str
-    pet_policy: str
-    termination_notice: str
-    guest_policy: str
-    auto_renewal: str
-    hidden_fees: str
 
+    # --- Money Questions ---
+    security_deposit: str = Field(description="Total amount of the security deposit (e.g., '$2000').")
+    deposit_conditions: str = Field(
+        description="Summary of conditions for losing the deposit (e.g., 'Damage beyond normal wear, unpaid rent, cleaning fees').")
+    non_refundable_fees: str = Field(
+        description="List any non-refundable fees (e.g., 'Move-in fee: $500, Pet fee: $250').")
+    late_fee_policy: str = Field(
+        description="The policy for late rent (e.g., '$50 fee if paid after the 5th of the month').")
+
+    # --- Moving Out Questions ---
+    termination_notice: str = Field(
+        description="The required notice period before the lease ends (e.g., '60 days written notice').")
+    early_termination_penalty: str = Field(
+        description="The penalty for breaking the lease early (e.g., 'Must pay 2 months' rent').")
+    auto_renewal_clause: str = Field(
+        description="Does the lease auto-renew? (e.g., 'Yes, renews month-to-month' or 'Yes, renews for 1 year').")
+
+    # --- Living There Questions ---
+    pet_policy: str = Field(
+        description="Summary of pet rules (e.g., 'Allowed, $50/month pet rent, 40lb weight limit').")
+    guest_policy: str = Field(
+        description="Summary of guest rules (e.g., 'Guests allowed for up to 14 consecutive days').")
+    subletting_policy: str = Field(
+        description="Is subletting allowed? (e.g., 'Not allowed without written landlord consent').")
+    maintenance_and_repairs: str = Field(
+        description="Who is responsible for repairs (e.g., 'Tenant responsible for minor repairs, landlord for major systems').")
+    utilities_included: str = Field(
+        description="List all utilities paid by the landlord (e.g., 'Water and trash. Tenant pays gas and electric.').")
 
 # --- FastAPI App ---
 app = FastAPI()
@@ -43,13 +65,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- The AI Prompt (The "Secret Sauce") ---
+# --- The AI Prompt ---
 # FIX: This is now a simple template with placeholders
 PROMPT_TEMPLATE = """
 You are an expert legal assistant specializing in rental agreements.
 Your task is to extract specific, critical information from the lease text provided.
+Analyze the text and populate *all* fields in the JSON object.
 
-Analyze the text and return *only* a JSON object that strictly follows this Pydantic schema:
+**CRITICAL RULES:**
+1.  **Strictly Adhere to Schema:** Each field's summary must *only* contain information directly related to that field's description from the schema.
+2.  **Handle Missing Information:** If information for a specific field is not present in the text, the value for that field must be *only* the string "Not found".
+3.  **No Data Contamination:** Do *not* mention the absence of information for one field (e.g., "Guest policy was not found") in the summary of *another* field.
+
+**Field Instructions:**
+* For policies (like 'pet_policy' or 'guest_policy'), summarize the rule.
+* For fees (like 'late_fee_policy'), state the cost and conditions.
+
+Return *only* a JSON object that strictly follows this Pydantic schema:
 {schema}
 
 Here is the lease text:
@@ -58,7 +90,6 @@ Here is the lease text:
 ---
 
 Return *only* the JSON. Do not add any conversational text or markdown.
-If you cannot find a specific piece of information, return "Not found" for that field.
 """
 
 
