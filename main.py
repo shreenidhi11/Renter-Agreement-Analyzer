@@ -1,7 +1,9 @@
 import os
+import io  # <-- Add this import
+import PyPDF2  # <-- Add this import
 import json  # <-- FIX: Add this import
 import google.generativeai as genai
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -12,9 +14,10 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 # --- Pydantic Models (for data validation) ---
-class LeaseText(BaseModel):
-    """The input text from the user."""
-    text: str
+# We do not need the LeaseText Model now that we are tryong to upload a file
+# class LeaseText(BaseModel):
+#     """The input text from the user."""
+#     text: str
 
 
 class LeaseReport(BaseModel):
@@ -60,10 +63,37 @@ If you cannot find a specific piece of information, return "Not found" for that 
 
 # --- API Endpoint ---
 @app.post("/summarize", response_model=LeaseReport)
-async def summarize_lease(lease: LeaseText):
+async def summarize_lease(file: UploadFile = File(...)):
     """
-    Receives lease text, queries Gemini, and returns a structured report.
+    Receives a lease file (PDF or TXT), extracts text, queries Gemini,
+    and returns a structured report.
     """
+
+    lease_text = ""
+    contents = await file.read()  # Read the file bytes
+
+    # --- File Processing Logic ---
+    if file.filename.endswith('.pdf'):
+        try:
+            # Read PDF from in-memory bytes
+            pdf_reader = PyPDF2.PdfReader(io.BytesIO(contents))
+            for page in pdf_reader.pages:
+                lease_text += page.extract_text()
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Error parsing PDF: {e}")
+
+    elif file.filename.endswith('.txt'):
+        try:
+            # Decode text file from bytes
+            lease_text = contents.decode('utf-8')
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Error parsing TXT file: {e}")
+
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported file type. Please upload a .pdf or .txt file.")
+
+    if not lease_text.strip():
+        raise HTTPException(status_code=400, detail="Could not extract any text from the file.")
     model = genai.GenerativeModel(
         'gemini-2.5-flash',
         generation_config=genai.GenerationConfig(
@@ -75,7 +105,7 @@ async def summarize_lease(lease: LeaseText):
     schema_string = json.dumps(LeaseReport.model_json_schema(), indent=2)
 
     prompt = PROMPT_TEMPLATE.format(
-        lease_text=lease.text,
+        lease_text=lease_text,
         schema=schema_string
     )
 
