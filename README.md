@@ -12,6 +12,6 @@ Features:
     
     •	Analyses critical information from the renters document withins seconds 
     •	Displays important information like Rent price, Pets and Guest allowances etc
-    •	Supports both PDF and TXT documents
+    •	Supports summarization for PDFs, DOCXs and TXT documents
 
 
