@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Renter Summarizer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Rental Agreement Summarizer</h1>
+    <p>Paste your full lease text below.</p>
+    <textarea id="lease-text" placeholder="Your lease text here..."></textarea>
+    <button id="summarize-btn">Get Report Card</button>
+
+    <div id="loading" class="hidden">Summarizing...</div>
+    <div id="results-container" class="hidden">
+      <h2>Your Report Card</h2>
+      <div id="results"></div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
