@@ -1,6 +1,7 @@
 This is a Chrome Extension for Analyzing Renter Agreements
 
 Steps to run this project on your machine - TBD
+Note: Currently trying to make this available via chrome extension.
 
 Technologies Used:
 
