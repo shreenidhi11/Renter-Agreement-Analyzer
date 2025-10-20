@@ -1,7 +1,6 @@
-This is a Chrome Extension for Analyzing Renter Agreements
+This is a Website for Analyzing Renter Agreements
 
 Steps to run this project on your machine - TBD
-Note: Currently trying to make this available via chrome extension.
 
 Technologies Used:
 
@@ -15,4 +14,4 @@ Features:
     •	Displays important information like Rent price, Penalty costs, Pets and Guest allowance rules etc
     •	Supports summarization for PDFs, DOCXs and TXT documents
 
-
+Future Enhancements: Make this application available via a Chrome extension.
